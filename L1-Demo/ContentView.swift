@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  L1-Demo
-//
-//  Created by Aarav Gupta on 20/06/2024.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -18,19 +11,63 @@ struct ContentView: View {
                 .overlay(Color.black.opacity(0.2)) // Add a color overlay to reduce whiteness
             
             VStack {
-                // In-focus image on top of the blurred background
-                Image("bg")
-                    .resizable()
-                    .cornerRadius(15)
-                    .aspectRatio(contentMode: .fit)
-                    .padding(.horizontal, 30.0)
-                
-                // Text underneath the in-focus image
-                Text("Click on the sun")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white) // Set the text color to white
-                    .padding(.top, 10) // Add some padding at the top
+                Spacer() // Pushes content to the bottom
+
+                GeometryReader { geometry in
+                    VStack {
+                        Spacer()
+                        Image("bg")
+                            .resizable()
+                            .cornerRadius(15)
+                            .aspectRatio(contentMode: .fit)
+                            .padding(.horizontal, 30.0)
+                            .overlay(
+                                VStack {
+                                    Spacer() // Pushes content to the bottom
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text("My time at Bali")
+                                                .font(.largeTitle)
+                                                .fontWeight(.black)
+                                                .foregroundColor(Color.white)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        Spacer()
+                                        VStack(alignment: .trailing) {
+                                            HStack {
+                                                Image(systemName: "star.fill")
+                                                Image(systemName: "star.fill")
+                                                Image(systemName: "star.fill")
+                                                Image(systemName: "star.fill")
+                                                Image(systemName: "star.fill")
+                                            }
+                                            .foregroundColor(.orange)
+                                            Text("Reviews: 592")
+                                                .font(.footnote)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(Color.white)
+                                                .padding(.top, 5.0)
+                                        }
+                                    }
+                                    HStack {
+                                        Text("It left me speechless...")
+                                            .font(.headline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(Color.white)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.top, 20)
+                                        Spacer()
+                                    }
+                                }
+                                .padding([.leading, .trailing], 30)
+                                .padding(.bottom, 70)
+                                .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.9) // Ensures content is within the image bounds
+                            )
+                        Spacer()
+                    }
+                }
+
+                Spacer() // Ensures the image is centered vertically
             }
         }
     }
