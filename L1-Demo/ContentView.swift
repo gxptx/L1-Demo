@@ -1,73 +1,119 @@
 import SwiftUI
 
+// Data Model
+struct Review: Identifiable {
+    var id: UUID
+    var image: String
+    var title: String
+    var reviewText: String
+    var rating: Int
+    var reviewCount: Int
+}
+
+// Sample Reviews Array
+let sampleReviews = [
+    Review(id: UUID(), image: "bg", title: "My time at Bali", reviewText: "It left me speechless...", rating: 5, reviewCount: 592),
+    Review(id: UUID(), image: "bg2", title: "Exploring Paris", reviewText: "A wonderful experience!", rating: 4, reviewCount: 480)
+]
+
+// ContentView
 struct ContentView: View {
+    var reviews = sampleReviews
+    
+    var body: some View {
+        NavigationView {
+            List(reviews) { review in
+                NavigationLink(destination: ReviewDetailView(review: review)) {
+                    ReviewRow(review: review)
+                }
+            }
+            .navigationTitle("Reviews")
+        }
+    }
+}
+
+// ReviewRow View
+struct ReviewRow: View {
+    var review: Review
+    
+    var body: some View {
+        HStack {
+            Image(review.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 50, height: 50)
+                .cornerRadius(10)
+            VStack(alignment: .leading) {
+                Text(review.title)
+                    .font(.headline)
+                Text(review.reviewText)
+                    .font(.subheadline)
+            }
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+// ReviewDetailView
+struct ReviewDetailView: View {
+    var review: Review
+    
     var body: some View {
         ZStack {
-            // Blurred background image with a color overlay
-            Image("bg")
-                .resizable() // Ensure the image fills the entire background
+            Image(review.image)
+                .resizable()
                 .ignoresSafeArea()
                 .blur(radius: 5, opaque: true)
-                .overlay(Color.black.opacity(0.2)) // Add a color overlay to reduce whiteness
+                .overlay(Color.black.opacity(0.2))
             
             VStack {
-                Spacer() // Pushes content to the bottom
-
+                Spacer()
                 GeometryReader { geometry in
                     VStack {
-                        Spacer()
-                        Image("bg")
+                        Image(review.image)
                             .resizable()
                             .cornerRadius(15)
                             .aspectRatio(contentMode: .fit)
                             .padding(.horizontal, 30.0)
                             .overlay(
                                 VStack {
-                                    Spacer() // Pushes content to the bottom
+                                    Spacer()
                                     HStack {
                                         VStack(alignment: .leading) {
-                                            Text("My time at Bali")
+                                            Text(review.title)
                                                 .font(.largeTitle)
                                                 .fontWeight(.black)
+                                                .foregroundColor(Color.white)
+                                                .multilineTextAlignment(.leading)
+                                            Text(review.reviewText)
+                                                .font(.headline)
+                                                .fontWeight(.medium)
                                                 .foregroundColor(Color.white)
                                                 .multilineTextAlignment(.leading)
                                         }
                                         Spacer()
                                         VStack(alignment: .trailing) {
                                             HStack {
-                                                Image(systemName: "star.fill")
-                                                Image(systemName: "star.fill")
-                                                Image(systemName: "star.fill")
-                                                Image(systemName: "star.fill")
-                                                Image(systemName: "star.fill")
+                                                ForEach(0..<review.rating, id: \.self) { _ in
+                                                    Image(systemName: "star.fill")
+                                                        .foregroundColor(.orange)
+                                                }
                                             }
-                                            .foregroundColor(.orange)
-                                            Text("Reviews: 592")
+                                            Text("Reviews: \(review.reviewCount)")
                                                 .font(.footnote)
                                                 .fontWeight(.medium)
                                                 .foregroundColor(Color.white)
                                                 .padding(.top, 5.0)
                                         }
                                     }
-                                    HStack {
-                                        Text("It left me speechless...")
-                                            .font(.headline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(Color.white)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.top, 20)
-                                        Spacer()
-                                    }
+                                    .padding([.leading, .trailing, .bottom], 20)
                                 }
-                                .padding([.leading, .trailing], 30)
-                                .padding(.bottom, 70)
-                                .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.9) // Ensures content is within the image bounds
+                                .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.9)
                             )
-                        Spacer()
                     }
                 }
-
-                Spacer() // Ensures the image is centered vertically
+                Spacer()
             }
         }
     }
