@@ -58,6 +58,7 @@ struct ReviewRow: View {
 // ReviewDetailView
 struct ReviewDetailView: View {
     var review: Review
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {
@@ -67,9 +68,9 @@ struct ReviewDetailView: View {
                 .blur(radius: 5, opaque: true)
                 .overlay(Color.black.opacity(0.2))
             
-            VStack {
-                Spacer()
-                GeometryReader { geometry in
+            GeometryReader { geometry in
+                VStack {
+                    Spacer()
                     VStack {
                         Image(review.image)
                             .resizable()
@@ -77,48 +78,70 @@ struct ReviewDetailView: View {
                             .aspectRatio(contentMode: .fit)
                             .padding(.horizontal, 30.0)
                             .overlay(
-                                VStack {
+                                VStack(spacing: 10) {
                                     Spacer()
-                                    HStack {
-                                        VStack(alignment: .leading) {
-                                            Text(review.title)
-                                                .font(.largeTitle)
-                                                .fontWeight(.black)
-                                                .foregroundColor(Color.white)
-                                                .multilineTextAlignment(.leading)
-                                            Text(review.reviewText)
-                                                .font(.headline)
-                                                .fontWeight(.medium)
-                                                .foregroundColor(Color.white)
-                                                .multilineTextAlignment(.leading)
-                                        }
-                                        Spacer()
-                                        VStack(alignment: .trailing) {
-                                            HStack {
-                                                ForEach(0..<review.rating, id: \.self) { _ in
-                                                    Image(systemName: "star.fill")
-                                                        .foregroundColor(.orange)
-                                                }
+                                    VStack(spacing: 10) {
+                                        Text(review.title)
+                                            .font(.largeTitle)
+                                            .fontWeight(.black)
+                                            .foregroundColor(Color.white)
+                                            .multilineTextAlignment(.leading)
+                                        
+                                        Text(review.reviewText)
+                                            .font(.headline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(Color.white)
+                                            .multilineTextAlignment(.leading)
+                                        
+                                        HStack {
+                                            ForEach(1...5, id: \.self) { index in
+                                                Image(systemName: index <= review.rating ? "star.fill" : (Double(index) - Double(0.5) <= Double(review.rating) ? "star.leadinghalf.fill" : "star"))
+                                                    .foregroundColor(.orange)
                                             }
+                                        }
+                                        
                                             Text("Reviews: \(review.reviewCount)")
                                                 .font(.footnote)
                                                 .fontWeight(.medium)
                                                 .foregroundColor(Color.white)
                                                 .padding(.top, 5.0)
-                                        }
                                     }
-                                    .padding([.leading, .trailing, .bottom], 20)
+                                    .padding()
+                                    .background(Color.black.opacity(0.5)) // Semi-opaque background
+                                    .cornerRadius(15) // Rounded corners for the container
+                                    .frame(width: geometry.size.width * 0.8) // Adjusted frame width
+                                    .padding(.bottom, geometry.safeAreaInsets.bottom + 20) // Align to bottom of image
+                                
                                 }
-                                .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.9)
-                            )
+                                )
                     }
+                    Spacer()
                 }
-                Spacer()
             }
         }
+        .navigationBarBackButtonHidden(true) // Hide default back button
+        .modifier(CustomBackButton()) // Apply custom back button modifier
     }
 }
 
+// Shared view modifier for custom back button
+struct CustomBackButton: ViewModifier {
+    @Environment(\.presentationMode) var presentationMode
+    
+    func body(content: Content) -> some View {
+        content
+            .navigationBarItems(
+                leading: Button(action: {
+                    self.presentationMode.wrappedValue.dismiss() // Navigate back
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .foregroundColor(.gray)
+                        .font(.title)
+                        .padding(.leading, 25.0)
+                }
+            )
+    }
+}
 #Preview {
     ContentView()
 }
