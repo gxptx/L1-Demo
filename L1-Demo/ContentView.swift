@@ -12,18 +12,18 @@ struct Review: Identifiable {
 
 // Sample Reviews Array
 let sampleReviews = [
-    Review(id: UUID(), image: "bg", title: "My time at Bali", reviewText: "It left me speechless...", rating: 5, reviewCount: 592),
-    Review(id: UUID(), image: "bg2", title: "Exploring Paris", reviewText: "A wonderful experience!", rating: 4, reviewCount: 480),
-    Review(id: UUID(), image: "bg3", title: "Skiing in Switzerland", reviewText: "Breathtaking views and slopes!", rating: 4, reviewCount: 340),
+    Review(id: UUID(), image: "bg", title: "My time at Bali", reviewText: "It left me speechless...", rating: 8, reviewCount: 592),
+    Review(id: UUID(), image: "bg2", title: "Exploring Paris", reviewText: "A wonderful experience!", rating: 9, reviewCount: 480),
+    Review(id: UUID(), image: "bg3", title: "Skiing in Switzerland", reviewText: "Breathtaking views and slopes!", rating: 7, reviewCount: 340),
     Review(id: UUID(), image: "bg4", title: "Beach days in Maldives", reviewText: "Paradise on Earth!", rating: 5, reviewCount: 890),
     Review(id: UUID(), image: "bg5", title: "Cultural immersion in Kyoto", reviewText: "Rich history and traditions.", rating: 5, reviewCount: 720),
-    Review(id: UUID(), image: "bg6", title: "Road trip across Australia", reviewText: "Unforgettable landscapes.", rating: 4, reviewCount: 410),
-    Review(id: UUID(), image: "bg7", title: "New York City adventures", reviewText: "City that never sleeps!", rating: 4, reviewCount: 600),
-    Review(id: UUID(), image: "bg8", title: "Hiking in the Rockies", reviewText: "Majestic mountains and wildlife.", rating: 5, reviewCount: 550),
-    Review(id: UUID(), image: "bg9", title: "Exploring Tokyo", reviewText: "Fascinating blend of modern and tradition.", rating: 4, reviewCount: 490),
-    Review(id: UUID(), image: "bg10", title: "Cruise in the Caribbean", reviewText: "Relaxing and luxurious experience.", rating: 4, reviewCount: 380),
-    // Add more reviews as needed
+    Review(id: UUID(), image: "bg6", title: "Road trip across Australia", reviewText: "Unforgettable landscapes.", rating: 9, reviewCount: 410),
+    Review(id: UUID(), image: "bg7", title: "New York City adventures", reviewText: "City that never sleeps!", rating: 10, reviewCount: 600),
+    Review(id: UUID(), image: "bg8", title: "Hiking in the Rockies", reviewText: "Majestic mountains and wildlife.", rating: 8, reviewCount: 550),
+    Review(id: UUID(), image: "bg9", title: "Exploring Tokyo", reviewText: "Fascinating blend of modern and tradition.", rating: 7, reviewCount: 490),
+    Review(id: UUID(), image: "bg10", title: "Cruise in the Caribbean", reviewText: "Relaxing and luxurious experience.", rating: 10, reviewCount: 380),
 ]
+
 // ContentView
 struct ContentView: View {
     var reviews = sampleReviews
@@ -103,7 +103,7 @@ struct ReviewDetailView: View {
                                         
                                         HStack {
                                             ForEach(1...5, id: \.self) { index in
-                                                Image(systemName: index <= review.rating ? "star.fill" : (Double(index) - Double(0.5) <= Double(review.rating) ? "star.leadinghalf.fill" : "star"))
+                                                Image(systemName: Double(index) <= Double(review.rating) / 2.0 ? "star.fill" : (Double(index) - 0.5 <= Double(review.rating) / 2.0 ? "star.leadinghalf.fill" : "star"))
                                                     .foregroundColor(.orange)
                                             }
                                         }
@@ -127,34 +127,29 @@ struct ReviewDetailView: View {
             }
         }
         .navigationBarBackButtonHidden(true) // Hide default back button
-        .navigationBarItems(leading: CustomBackButton(presentationMode: presentationMode, imageBackgroundColor: Color.black.opacity(0.2))) // Apply custom back button view directly
+        .modifier(CustomBackButton()) // Apply custom back button modifier
     }
 }
 
-struct CustomBackButton: View {
-    var presentationMode: Binding<PresentationMode>
-    var imageBackgroundColor: Color
+// Shared view modifier for custom back button
+struct CustomBackButton: ViewModifier {
+    @Environment(\.presentationMode) var presentationMode
     
-    var body: some View {
-        Button(action: {
-            self.presentationMode.wrappedValue.dismiss() // Navigate back
-        }) {
-            Image(systemName: "arrow.left.circle")
-                .foregroundColor(imageBackgroundColor.isDark ? .white : .black) // Adjusted button color based on background brightness
-                .font(.title)
-                .padding(.leading, 25.0)
-        }
+    func body(content: Content) -> some View {
+        content
+            .navigationBarItems(
+                leading: Button(action: {
+                    self.presentationMode.wrappedValue.dismiss() // Navigate back
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .foregroundColor(.white)
+                        .font(.title)
+                        .padding(.leading, 25.0)
+                }
+            )
     }
 }
 
-extension Color {
-    var isDark: Bool {
-        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
-        guard UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return true }
-        let lum = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-        return lum < 0.5
-    }
-}
 #Preview {
     ContentView()
 }
